@@ -30,14 +30,14 @@ db.connect(function(err){
   }
   
   // Create database
-  db.query('CREATE DATABASE if not exists UserDB', function(err, result){
+  db.query('CREATE DATABASE if not exists UserDB', function(err: any, result: any){
     if(err){
       console.log('can\'t create db');
     } else{
       console.log('db created');
     }
     // Create schema
-    const createTable = `CREATE TABLE if not exists Users(
+    let createTable: string = `CREATE TABLE if not exists Users(
       id INT,
       firstName VARCHAR(30),
       lastName VARCHAR(30),
@@ -66,7 +66,7 @@ db.connect(function(err){
 
 // READ
 app.get('/users', function(req: Request, res: Response){
-  const queryString = 'SELECT * FROM Users'
+  let queryString: string = 'SELECT * FROM Users'
   db.query(queryString, function(err: any, results: any, fields: any){
     if(err){
       console.log('error on read');
@@ -81,8 +81,9 @@ app.get('/users', function(req: Request, res: Response){
 
 // Query data by user ID
 app.get('/users/:id', function(req: Request, res: Response){
-  const queryString = 'SELECT * FROM Users WHERE id = ?'
-  db.query(queryString, req.params.id, function(err, results, fields){
+  let queryString: string = 'SELECT * FROM Users WHERE id = ?'
+  let queryData: number = req.params.id
+  db.query(queryString, queryData, function(err: any, results: any, fields: any){
     if(err){
       console.log('error on read');
       //throw err;
@@ -92,16 +93,14 @@ app.get('/users/:id', function(req: Request, res: Response){
 });
 
 // INSERT/CREATE
-app.post('/users', function(req: Request, res: Response){
-  const insertString = `INSERT INTO Users (id, firstName, lastName, 
-                        departmentName, managerName, dateOfBirth, 
-                        gender, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+app.post('/users/:id/:dpt/:dob/:gen/:stat', function(req: Request, res: Response){
+  let insertString: string = `INSERT INTO Users (id, departmentName, 
+                                dateOfBirth, gender, status) VALUES (?, ?, ?, ?, ?)`
 
-  const insertData = [req.body.id, req.body.firstName, req.body.lastName, 
-                      req.body.dptName, req.body.manName, req.body.dob, 
-                      req.body.gender, req.body.status]
+  let insertData: [number, string, Date, string, string]
+  insertData = [req.params.id, req.params.dpt, req.params.dob, req.params.gen, req.params.stat]
 
-  db.query(insertString, insertData, function(err, results, fields){
+  db.query(insertString, insertData, function(err: any, results: any, fields: any){
     if(err){
       console.log('error on insert');
       //console.log(req.body);
@@ -116,7 +115,7 @@ app.post('/users', function(req: Request, res: Response){
 
 // UPDATE
 app.put('/users/:id/:man', function(req: Request, res: Response){
-  const updateString = `UPDATE Users SET managerName = ? WHERE id = ?`;
+  let updateString: string = `UPDATE Users SET managerName = ? WHERE id = ?`;
   let updateData: [string, number] = [req.params.man.toString(), req.params.id]
   db.query(updateString, updateData, function(err, results, fields){
     if(err){
@@ -131,8 +130,9 @@ app.put('/users/:id/:man', function(req: Request, res: Response){
 
 // DELETE
 app.delete('/users/:id', function(req: Request, res: Response){
-  const deleteString = 'DELETE FROM Users WHERE id = ?';
-  db.query(deleteString, req.params.id, function(err, results, fields){
+  let deleteString: string = 'DELETE FROM Users WHERE id = ?';
+  let deleteData: number = req.params.id
+  db.query(deleteString, deleteData, function(err: any, results: any, fields: any){
     if(err){
       console.log('error on delete');
       //throw err;
